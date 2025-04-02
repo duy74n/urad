@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "formulahendry.auto-rename-tag",
+    "biomejs.biome",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
