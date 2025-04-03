@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
-import { postQueryOptions } from "../../queries/queryOptions"
+import { postQueryOptions } from "../../../queries/queryOptions"
 
-export const Route = createFileRoute("/_posts/posts/$postId")({
+export const Route = createFileRoute("/_authenticated/_posts/posts/$postId")({
   component: PostComponent,
   pendingComponent: () => <div>Loading post detail ...</div>,
   errorComponent: () => <div>Post not found!</div>,

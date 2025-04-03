@@ -11,16 +11,31 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LoginImport } from './routes/login'
 import { Route as AboutImport } from './routes/about'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as IndexImport } from './routes/index'
-import { Route as PostsPostsImport } from './routes/_posts/posts'
-import { Route as PostsPostsPostIdImport } from './routes/_posts/posts.$postId'
+import { Route as AuthenticatedSettingsImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedDashboardImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPostsPostsImport } from './routes/_authenticated/_posts/posts'
+import { Route as AuthenticatedPostsPostsPostIdImport } from './routes/_authenticated/_posts/posts.$postId'
 
 // Create/Update Routes
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -30,17 +45,30 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PostsPostsRoute = PostsPostsImport.update({
-  id: '/_posts/posts',
-  path: '/posts',
-  getParentRoute: () => rootRoute,
+const AuthenticatedSettingsRoute = AuthenticatedSettingsImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const PostsPostsPostIdRoute = PostsPostsPostIdImport.update({
-  id: '/$postId',
-  path: '/$postId',
-  getParentRoute: () => PostsPostsRoute,
+const AuthenticatedDashboardRoute = AuthenticatedDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
+
+const AuthenticatedPostsPostsRoute = AuthenticatedPostsPostsImport.update({
+  id: '/_posts/posts',
+  path: '/posts',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedPostsPostsPostIdRoute =
+  AuthenticatedPostsPostsPostIdImport.update({
+    id: '/$postId',
+    path: '/$postId',
+    getParentRoute: () => AuthenticatedPostsPostsRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -53,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -60,78 +95,156 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/_posts/posts': {
-      id: '/_posts/posts'
-      path: '/posts'
-      fullPath: '/posts'
-      preLoaderRoute: typeof PostsPostsImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/_posts/posts/$postId': {
-      id: '/_posts/posts/$postId'
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/_posts/posts': {
+      id: '/_authenticated/_posts/posts'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof AuthenticatedPostsPostsImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/_posts/posts/$postId': {
+      id: '/_authenticated/_posts/posts/$postId'
       path: '/$postId'
       fullPath: '/posts/$postId'
-      preLoaderRoute: typeof PostsPostsPostIdImport
-      parentRoute: typeof PostsPostsImport
+      preLoaderRoute: typeof AuthenticatedPostsPostsPostIdImport
+      parentRoute: typeof AuthenticatedPostsPostsImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface PostsPostsRouteChildren {
-  PostsPostsPostIdRoute: typeof PostsPostsPostIdRoute
+interface AuthenticatedPostsPostsRouteChildren {
+  AuthenticatedPostsPostsPostIdRoute: typeof AuthenticatedPostsPostsPostIdRoute
 }
 
-const PostsPostsRouteChildren: PostsPostsRouteChildren = {
-  PostsPostsPostIdRoute: PostsPostsPostIdRoute,
+const AuthenticatedPostsPostsRouteChildren: AuthenticatedPostsPostsRouteChildren =
+  {
+    AuthenticatedPostsPostsPostIdRoute: AuthenticatedPostsPostsPostIdRoute,
+  }
+
+const AuthenticatedPostsPostsRouteWithChildren =
+  AuthenticatedPostsPostsRoute._addFileChildren(
+    AuthenticatedPostsPostsRouteChildren,
+  )
+
+interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedPostsPostsRoute: typeof AuthenticatedPostsPostsRouteWithChildren
 }
 
-const PostsPostsRouteWithChildren = PostsPostsRoute._addFileChildren(
-  PostsPostsRouteChildren,
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedPostsPostsRoute: AuthenticatedPostsPostsRouteWithChildren,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
 )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/posts': typeof PostsPostsRouteWithChildren
-  '/posts/$postId': typeof PostsPostsPostIdRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/posts': typeof AuthenticatedPostsPostsRouteWithChildren
+  '/posts/$postId': typeof AuthenticatedPostsPostsPostIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/posts': typeof PostsPostsRouteWithChildren
-  '/posts/$postId': typeof PostsPostsPostIdRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/posts': typeof AuthenticatedPostsPostsRouteWithChildren
+  '/posts/$postId': typeof AuthenticatedPostsPostsPostIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/_posts/posts': typeof PostsPostsRouteWithChildren
-  '/_posts/posts/$postId': typeof PostsPostsPostIdRoute
+  '/login': typeof LoginRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/_posts/posts': typeof AuthenticatedPostsPostsRouteWithChildren
+  '/_authenticated/_posts/posts/$postId': typeof AuthenticatedPostsPostsPostIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/posts' | '/posts/$postId'
+  fullPaths:
+    | '/'
+    | ''
+    | '/about'
+    | '/login'
+    | '/dashboard'
+    | '/settings'
+    | '/posts'
+    | '/posts/$postId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/posts' | '/posts/$postId'
-  id: '__root__' | '/' | '/about' | '/_posts/posts' | '/_posts/posts/$postId'
+  to:
+    | '/'
+    | ''
+    | '/about'
+    | '/login'
+    | '/dashboard'
+    | '/settings'
+    | '/posts'
+    | '/posts/$postId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/login'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/settings'
+    | '/_authenticated/_posts/posts'
+    | '/_authenticated/_posts/posts/$postId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
-  PostsPostsRoute: typeof PostsPostsRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
-  PostsPostsRoute: PostsPostsRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 
 export const routeTree = rootRoute
@@ -145,25 +258,46 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/_authenticated",
         "/about",
-        "/_posts/posts"
+        "/login"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
+    "/_authenticated": {
+      "filePath": "_authenticated.tsx",
+      "children": [
+        "/_authenticated/dashboard",
+        "/_authenticated/settings",
+        "/_authenticated/_posts/posts"
+      ]
+    },
     "/about": {
       "filePath": "about.tsx"
     },
-    "/_posts/posts": {
-      "filePath": "_posts/posts.tsx",
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/_authenticated/dashboard": {
+      "filePath": "_authenticated/dashboard.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/settings": {
+      "filePath": "_authenticated/settings.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/_posts/posts": {
+      "filePath": "_authenticated/_posts/posts.tsx",
+      "parent": "/_authenticated",
       "children": [
-        "/_posts/posts/$postId"
+        "/_authenticated/_posts/posts/$postId"
       ]
     },
-    "/_posts/posts/$postId": {
-      "filePath": "_posts/posts.$postId.tsx",
-      "parent": "/_posts/posts"
+    "/_authenticated/_posts/posts/$postId": {
+      "filePath": "_authenticated/_posts/posts.$postId.tsx",
+      "parent": "/_authenticated/_posts/posts"
     }
   }
 }
