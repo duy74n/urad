@@ -1,3 +1,4 @@
+import { Button } from "@mantine/core"
 import { createFileRoute, useLocation, useRouter } from "@tanstack/react-router"
 import { useAuth } from "../hooks/useAuth"
 
@@ -12,12 +13,10 @@ function RouteComponent() {
 
   return (
     <>
-      <h2>Login Page</h2>
       {isLogged() ? (
         <>
-          <p>Hello user!</p>
-          <button
-            type='button'
+          <p className='text-lg font-bold'>Hello user!</p>
+          <Button
             onClick={async () => {
               signOut()
               router.invalidate()
@@ -26,14 +25,12 @@ function RouteComponent() {
                 replace: true,
               })
             }}
-            className='border border-amber-500 p-2 cursor-pointer'
           >
             Sign out
-          </button>
+          </Button>
         </>
       ) : (
-        <button
-          type='button'
+        <Button
           onClick={async () => {
             signIn()
             router.invalidate()
@@ -44,10 +41,9 @@ function RouteComponent() {
               replace: true,
             })
           }}
-          className='border border-amber-500 p-2 cursor-pointer'
         >
           Sign in
-        </button>
+        </Button>
       )}
     </>
   )

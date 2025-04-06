@@ -1,3 +1,5 @@
+import { Button, Modal } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import {
   Link,
   Outlet,
@@ -17,7 +19,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   component: () => {
     const [isAuth] = useAtom(isAuthenticatedAtom)
     const router = useRouter()
-    const { signOut } = useAuth()
+    const { signIn, signOut, isLogged } = useAuth()
+    const [opened, { open, close }] = useDisclosure(false)
 
     return (
       <>
@@ -54,34 +57,63 @@ export const Route = createRootRouteWithContext<RouterContext>()({
               >
                 Settings
               </Link>
-              <button
-                type='button'
-                className='[&.active]:font-bold ml-auto'
-                onClick={async () => {
-                  signOut()
-                  router.invalidate()
-                  router.navigate({
-                    to: "/",
-                    replace: true,
-                  })
-                }}
-              >
-                Logout
-              </button>
+              <div className='ml-auto'>
+                <Button
+                  onClick={() => open()}
+                  variant='outline'
+                >
+                  Sign Out
+                </Button>
+              </div>
             </>
           ) : (
-            <Link
-              to='/login'
-              className='ml-auto'
-            >
-              Login
-            </Link>
+            <div className='ml-auto'>
+              <Button
+                onClick={() => open()}
+                variant='outline'
+              >
+                Sign In
+              </Button>
+            </div>
           )}
         </div>
         <hr />
         <div className='p-2'>
           <Outlet />
         </div>
+        <Modal
+          opened={opened}
+          onClose={close}
+          title='Authentication'
+          centered
+        >
+          {isLogged() ? (
+            <>
+              <p className='text-lg font-bold'>Hello user!</p>
+              <Button
+                onClick={async () => {
+                  signOut()
+                  router.navigate({
+                    to: "/",
+                    replace: true,
+                  })
+                  close()
+                }}
+              >
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={async () => {
+                signIn()
+                close()
+              }}
+            >
+              Sign in
+            </Button>
+          )}
+        </Modal>
         <TanStackRouterDevtools />
       </>
     )

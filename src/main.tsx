@@ -1,9 +1,13 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 
-import "./index.css"
+import AppMantineProvider from "./providers/AppMantineProvider"
 import AppQueryClientProvider from "./providers/AppQueryClientProvider"
 import AppRoute from "./providers/AppRoute"
+
+import "@mantine/core/styles.css"
+import "@mantine/dates/styles.css"
+import "./index.css"
 
 // Render the app
 // biome-ignore lint/style/noNonNullAssertion: <explanation>
@@ -13,7 +17,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <AppQueryClientProvider>
-        <AppRoute />
+        <AppMantineProvider>
+          <AppRoute />
+        </AppMantineProvider>
       </AppQueryClientProvider>
     </StrictMode>
   )
